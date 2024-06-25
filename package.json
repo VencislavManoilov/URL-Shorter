@@ -1,0 +1,12 @@
+{
+  "name": "url-shorter",
+  "version": "1.0.0",
+  "description": "This project is for URL shorting. It is using htmx for the front-end, node.js and express.js for the back-end and SQLite database for storing everything!",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Vencislav Manoilov",
+  "license": "ISC"
+}
