@@ -1,0 +1,7 @@
+html, body {
+    color: var(--bs-emphasis-color);
+}
+
+.container {
+    --bs-gutter-x: 3rem;
+}
