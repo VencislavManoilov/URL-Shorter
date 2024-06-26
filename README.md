@@ -1,1 +1,1 @@
-This project is for URL shorting. It is using JQuery for the front-end, node.js and express.js for the back-end and SQLite database for storing everything!
+This project is for URL shorting. It is using JQuery and Bootstrap for the front-end, node.js and express.js for the back-end and SQLite database for storing everything!
