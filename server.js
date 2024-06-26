@@ -4,6 +4,9 @@ const path = require("path");
 const mysql = require("mysql2");;
 
 const PORT = 8080;
+
+app.use(express.static("public"));
+
 // Configure MySQL connection
 const db = mysql.createConnection({
     host: 'localhost',
@@ -24,15 +27,28 @@ db.connect((err, connection) => {
     console.log('Connected to MySQL');
 });
 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+})
+
 app.post("/shorten", (req, res) => {
-    const { url, newURL } = req.query;
+    let { url, newURL } = req.query;
 
     if (!url || typeof url != "string")
     return res.status(400).json({ error: "URL is not correct" });
 
-    if (!newURL || typeof newURL != "string") {
+    // Ensure the url starts with "http://" or "https://"
+    if (!/^https?:\/\//i.test(url)) {
+        url = "http://" + url;
+    }
+
+    if (!newURL || typeof newURL != "string" || !/^[\w-]+$/.test(newURL)) {
         newURL = generateRandomString(5);
     } else {
+        // Database can get max 30 characters for the short_url
+        if(newURL.length > 30)
+        return res.status(400).json({ error: "The short url is too big" });
+
         checkIfExists(newURL)
         .then((exists) => {
             if (exists) {
