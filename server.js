@@ -1,11 +1,16 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-const mysql = require("mysql2");;
+const mysql = require("mysql2");
+const bodyParser = require("body-parser");
 
 const PORT = 8080;
 
 app.use(express.static("public"));
+
+app.use(bodyParser.json());
+// Parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configure MySQL connection
 const db = mysql.createConnection({
@@ -32,7 +37,7 @@ app.get("/", (req, res) => {
 })
 
 app.post("/shorten", (req, res) => {
-    let { url, newURL } = req.query;
+    let { url, newURL } = req.body;
 
     if (!url || typeof url != "string")
     return res.status(400).json({ error: "URL is not correct" });
@@ -44,6 +49,14 @@ app.post("/shorten", (req, res) => {
 
     if (!newURL || typeof newURL != "string" || !/^[\w-]+$/.test(newURL)) {
         newURL = generateRandomString(5);
+        const query = 'INSERT INTO urls (original_url, short_url) VALUES (?, ?)';
+        db.query(query, [url, newURL], (err, result) => {
+            if (err) {
+                console.error('Error inserting into MySQL:', err);
+                return res.status(500).send('Error saving URL');
+            }
+            res.status(200).json({ success: true, url: newURL });
+        });
     } else {
         // Database can get max 30 characters for the short_url
         if(newURL.length > 30)
@@ -60,7 +73,7 @@ app.post("/shorten", (req, res) => {
                         console.error('Error inserting into MySQL:', err);
                         return res.status(500).send('Error saving URL');
                     }
-                    res.status(200).json({ success: true });
+                    res.status(200).json({ success: true, url: newURL });
                 });
             }
         })

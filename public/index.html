@@ -3,10 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>URL Shortener</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
-    <h1>Hello World</h1>
+    <h1>Welcome to URL Shortener</h1>
+
+    <label for="original_url">Place the url:</label>
+    <input id="original_url" type="text">
+    <br />
+    <input type="radio" id="random" name="options" value="1" checked>
+    <label for="random">Random</label>
+    <input type="radio" id="custom" name="options" value="2">
+    <label for="custom">Custom</label><br>
+
+    <label id="short_url_label" for="short_url">Type custom short url</label>
+    <input id="short_url" type="text">
+
+    <br />
+    <button id="send">Send</button>
+
+    <br />
+    <h2 id="link-info" style="display: none;">You can see your shorter url here: <a id="link" href="">/</a></h2>
+
+    <script>
+        $(document).ready(function() {
+            $('#short_url').hide();
+            $('#short_url_label').hide();
+            
+            function checkInputs() {
+                const originalUrl = $('#original_url').val().trim();
+                const isCustomChecked = $('#custom').is(':checked');
+                const shortUrl = $('#short_url').val().trim();
+
+                if (originalUrl && (!isCustomChecked || (isCustomChecked && shortUrl))) {
+                    $('#send').show();
+                } else {
+                    $('#send').hide();
+                }
+            }
+
+            $('input[name="options"]').change(function() {
+                if ($('#custom').is(':checked')) {
+                    $('#short_url').show();
+                    $('#short_url_label').show();
+                } else {
+                    $('#short_url').hide();
+                    $('#short_url_label').hide();
+                }
+                checkInputs();
+            });
+
+            $('#send').hide();
+
+            $('#original_url').change(function() {
+                if($('#original_url').length > 0) {
+                    $('#send').show();
+                } else {
+                    $('#send').hide();
+                }
+            });
+
+            $('#original_url, #short_url').on('input', function() {
+                checkInputs();
+            });
+
+            $('#send').click(function() {
+                const originalUrl = $('#original_url').val().trim();
+                const isCustomChecked = $('#custom').is(':checked');
+                const shortUrl = isCustomChecked ? $('#short_url').val().trim() : null;
+
+                let data;
+                if(isCustomChecked) {
+                    data = {
+                        url: originalUrl,
+                        newURL: shortUrl
+                    };
+                } else {
+                    data = {
+                        url: originalUrl
+                    }
+                }
+
+                $.ajax({
+                    url: '/shorten', 
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        $("#link-info").show();
+                        $("#link").text('/' + response.url);
+                        $("#link").attr('href', '/' + response.url);
+                    },
+                    error: function(error) {
+                        // Handle error response
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
