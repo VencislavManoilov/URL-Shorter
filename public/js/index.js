@@ -73,7 +73,7 @@ $(document).ready(function() {
             },
             error: function(error) {
                 // Handle error response
-                console.log('Error:', error);
+                appendAlert(error.responseJSON.error, "danger");
             }
         });
     });
