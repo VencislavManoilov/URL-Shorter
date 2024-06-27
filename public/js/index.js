@@ -48,6 +48,8 @@ $(document).ready(function() {
         const isCustomChecked = $('#custom').is(':checked');
         const shortUrl = isCustomChecked ? $('#short_url').val().trim() : null;
 
+        $(".alert").hide();
+
         let data;
         if(isCustomChecked) {
             data = {
